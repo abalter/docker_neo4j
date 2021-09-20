@@ -1,4 +1,5 @@
-# Docker Rstudio
+# Docker neo4j
+
 ## Introduction
 I created this recipe to use  on Google Cloud Platform virtual machines. My goal is to be able to launch a 
 docker container running RStudio Server with the following:
