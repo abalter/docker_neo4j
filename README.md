@@ -6,18 +6,17 @@ docker container running RStudio Server with the following:
 1. There is a directory `/home/$USER` mapped to my `/home/$USER` directory on the host
 1. The container server is configured to use my conda instance for the R executable. This requires adding
    `r-session-which=/home/$USER/conda/bin/R` to the file `/etc/rstudio/rserver.conf`
-1. The container is not exposed to the internet for security
-1. Internet access to/from the host can be turned on and off
+1. (The container is not exposed to the internet for security this may not be necessary)
+1. (Internet access to/from the host can be turned on and off this may not be necessary)
 
 This way:
 
 1. I can limit exposure to my data and conda instance
-1. I can limit exposure to sensitive data I might be processing in RStudio
+1. I can limit exposure to sensitive data I might be processing
 
 Right now, it "works"
 
 ## Prerequisites
-1. You can create a VM in GCP
 1. You have a directory on that machine at `/home/$USER` that contains a miniconda instance at
    `/home/${USER}/conda`
 1. You have installed R into that conda instance such that `which R` ---> `/home/${USER}/conda/bin/R`.
