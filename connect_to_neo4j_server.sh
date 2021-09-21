@@ -1,38 +1,83 @@
+#!/bin/bash
 
 
-#PROJECT_ID=psjh-eacri-data
-PROJECT_ID=psjh-238522
-NETWORK=projects/phs-205720/global/networks/psjh-connect
-SUBNET=projects/phs-205720/regions/us-east1/subnetworks/mgmt01
-ZONE=us-east1-b
-NEO4J_IMAGE=neo4j-enterprise-1-4-2-2-apoc
-VM_NAME=balter-neo4j-2
+showUsage()
+{
+echo "
+DESCRIPTION:
+	Connect to GCP VM tunneling ports
 
-VM_NAME=$1
-VM_NAME=${VM_NAME:-balter-neo4j}
+USAGE: 
+    $(basename $0) -n VM_NAME [-p PORT -p ....] [-j PROJECT] [-z ZONE] 
 
-# ssh into the vm in the psjh-eacri-biggraph project using
-# the internal ip address over the IAP proxy and port
-# forward Neo4j ports over the tunnel
-#
-# Neo4j documented ports
-#    HTTP  7473
-#    HTTPS 7474
-#    Bolt  7687
-#
-# the "--" is an alternative to using the "--ssh-flag" argument
+OPTIONS:
+	-p PORT:		Port to tunnel.
+	-j PROJECT_ID:		GCP project id. Defaults to env.
+	-z ZONE:		GCP zone. Defaults to env.
+	-n VM_NAME:		Name of the GCP VM.
+	-h:			Show this message.
+" >&2
+}
 
-cmd="
-gcloud beta compute ssh \
-  --zone ${ZONE} \
-  --project ${PROJECT_ID} \
-  ${VM_NAME} \
-  --tunnel-through-iap \
-  -- \
-  -L 7473:localhost:7473 \
-  -L 7474:localhost:7474 \
-  -L 7687:localhost:7687
-"
+ports=
+cmd="gcloud beta compute ssh"
+
+while getopts ":n:j:p:z:h" flag; do
+    case "${flag}" in
+
+        j)
+            PROJECT_ID=${OPTARG}
+            cmd="$cmd --project $PROJECT_ID"
+			;;
+
+        z)
+            ZONE=${OPTARG}
+			cmd="$cmd --zone $ZONE"
+            ;;
+
+		p) 
+			ports="$ports ${OPTARG}"
+			;;
+
+		n)
+			VM_NAME=${OPTARG}
+			cmd="$cmd $VM_NAME"
+			;;
+
+        h)
+            showUsage
+            exit 0
+            ;;
+
+        /?)
+            showUsage
+            exit 1
+            ;;
+    esac
+done
+
+if [[ -z $VM_NAME ]]; then
+	echo "***ERROR...no name***"
+	showUsage
+	exit 1
+fi
+
+if [[ "$ports" != "" ]]; then
+	#echo "got ports $ports"
+	
+	### loop through list of ports and add tunnel for each
+	tunnel_string="-- "
+	for port in $ports; do
+		tunnel_string="$tunnel_string -L $port:localhost:$port"
+	done
+
+	#echo "tunnel_string: $tunnel_string"
+else
+	echo
+	#echo "no tunnel"
+fi
+
+cmd="$cmd --tunnel-through-iap $tunnel_string"
 
 echo $cmd
 
