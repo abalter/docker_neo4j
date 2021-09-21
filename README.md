@@ -19,6 +19,7 @@ Right now, it "works"
 1. Can exit
 
 ### Locally
-1. Run `./connect_to_neo4j_server.sh` providing your parameters
+1. Run `./connect_to_neo4j_server.sh` providing your parameters 
+   (see `./connect_to_neo4j_server.sh -h`)
 1. Browse `localhost:7474`
 
