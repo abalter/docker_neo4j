@@ -9,6 +9,7 @@ NEO4J_IMAGE=neo4j-enterprise-1-4-2-2-apoc
 VM_NAME=balter-neo4j-2
 
 VM_NAME=$1
+VM_NAME=${VM_NAME:-balter-neo4j}
 
 # ssh into the vm in the psjh-eacri-biggraph project using
 # the internal ip address over the IAP proxy and port
